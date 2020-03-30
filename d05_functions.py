@@ -1,13 +1,26 @@
 # todo functional programming
 """
-
-1、函数内省
+1、函数是一等对象
+    a.能赋值给变量，能作为其他数据结构的元素。
+    b.能做函数的参数
+    c.能做函数的返回值
+2、b,c 合起来可以构成高阶函数。即接收一个函数作为参数或者返回一个函数的函数。内置的像map，filter，reduce
+sorted，max，min 装饰器
+3、map，filter的直接替代品 -- 生成器表达式。相比着lambda表达式可读性更好。
+4、functools.reduce 主要作用就是求和，3版本以来，用sum()求和更好。
+  reduce 和 sum 都是归一函数：把一系列的值整合成一个结果。此外还是 any()/all()
+5、匿名函数。受python语法限制，lambda表达式要尽量简洁，如果比较复杂请用def实现。lambda表达式常作为高阶函数的
+参数使用，如果map/filter/sorted
+6、如果一个对象要可调用，内部需实现 __call__方法。如装饰器的面向对象写法。
+7、*args和**kwargs 除了基本的用法外，还需要注意一点就是：传参的时候，实参关键字参数形式可以给位置参数传参，注意
+得是同名的位置参数。
+8、函数内省
   func.__code__：存放函数体信息（名称，参数）
   如果想提取一个函数的信息 ————内置模块inspect
-2、参数注解
+9、参数注解
     def clip(text:str, max_len:'int > 0'=5) -> str:
     仅供IDE、框架调用获取函数信息、python不做任何的检查
-3、内置函数式编程模块
+10、内置函数式编程模块
     operator:
         1、mul: 搭配reduce实现阶乘 operator 有很多关于运算符的函数
         2、itemgetter: 获取序列或者可迭代你对象的元素，常和内置的那几个高阶函数一块使用
@@ -23,9 +36,44 @@
         partialmethod : 和partial 一样，不过是冻结方法的参数 注意！要在类内创建
 
 """
+# 阶乘
+import random
+from functools import reduce
+# reduce 实现
+print(reduce(lambda x, y: x * y, range(1, 10)))
+
+
+# map 及生成器表达式
+def fact(n):
+    return n * fact(n - 1) if n > 1 else n
+
+
+print(list(map(fact, range(1, 10))))
+print(list((fact(n) for n in range(1, 10))))
+
+
+# __call__
+class Item:
+
+    def __init__(self, iterable):
+        self.data = list(iterable)
+        random.shuffle(self.data)
+
+    def __call__(self, *args, **kwargs):
+        try:
+            ret = self.data.pop()
+        except IndexError:
+            raise LookupError('pop from empty list')
+        return ret
+
+
+item = Item([])
+# item()
+
+data_list = []
+
 
 # 剪切函数，用指定长度截断字串
-data_list = []
 def clip(text:str, max_len:'int > 0'=5) -> list:
     """适用于理想文本状态"""
     start = 0
