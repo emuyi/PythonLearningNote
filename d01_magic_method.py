@@ -7,7 +7,10 @@ __iter__方法。
 如 iter(),len()。通常情况下他们会更快更好，当让要重写的场景除外。
 4、__str__ 、str()/print的时候会被触发，对象中没有定义__str__时，__repr__会被触发。但如果对象中有__str__方法，
 调用 repr()的时候，__str__却不会被触发。
+
 """
+import collections
+import random
 
 
 class Vector:
@@ -16,16 +19,106 @@ class Vector:
         self.x = x
         self.y = y
 
+    def __repr__(self):
+        return '{}({}, {})'.format(type(self).__name__, self.x, self.y)
+
     def __add__(self, other):
-        return Vector(self.x + other.x, self.y + other.y)
+        return type(self)(self.x + other.x, self.y + other.y)
 
     def __mul__(self, other):
-        return Vector(self.x * other, self.y * other)
+        if not isinstance(other, int):
+            raise TypeError('must be int!')
+        return type(self)(self.x * other, self.y * other)
 
-    def __repr__(self):
-        return 'Vector({},{})'.format(self.x, self.y)
 
-
-v1 = Vector(1, 2)
-v2 = Vector(3, 4)
+v1 = Vector(2, 4)
+v2 = Vector(2, 1)
 print(v1 + v2)
+print(v1 * 3)
+
+
+# ===================================== review =====================================================
+# collections.namedtuple 命名元组
+Student = collections.namedtuple('Student', ('name', 'age', 'gender'))  # ('name', 'age', 'gender') 字符串组成的迭代对象
+Student = collections.namedtuple('Student', 'name age gender')
+
+ellen = Student('ellen', 18, 'female')
+print(ellen)
+print(ellen._fields)  # 已元组的形式返回所有的字段名
+print(Student._make(['bobby', 13, 'male']))  # 将一个可迭代对象实例化成命名元组对象
+print(ellen._asdict())  # 将命名元组对象变成一个OrderDict对象
+
+# list
+# 可变序列，支持index, slice[Slice], in, len, +, * ,嵌套列, 列表更新，删除, 可迭代
+lst = [i for i in range(10)] + list('abcd')
+
+lst.append('e')
+lst.extend(('ha','he', 'xi'))
+lst.insert(0, -1)
+
+print(lst.pop(-2))  # 根据索引进行pop， pop后的值会返回出来
+lst.append('ha')
+lst.remove('ha')  # remove根据值remove第一个匹配到的值，没有返回值
+print(lst)
+# lst.clear()
+
+print(lst.index('a',2))
+print(lst.count('ha'))
+
+print(len(lst))
+# print(max(lst))  # 当str 和 int 混合的时候，无法比较，当然也就无法排序
+print(lst)
+# # min()
+# lst.sort(reverse=False)  # True 由大到小
+lst.reverse()
+print(lst)
+# reversed()/sorted() 和 list.reverse/list.sort
+# 1.sort 是list的一个方法，sorted接受的是一个可迭代对象
+# 2.sort是对原列表进行修改，没有返回值，sorted是会生成一个新列表[reversed 是一个reversed对象]
+
+# random 模块
+print('*' * 200)
+print(random.random())  # [0,1)
+print(random.randint(1, 2))  # [a,b]
+print(random.uniform(1.1, 2.5))  # a, b 范围内的随机浮点数
+lst2 = [1, 5, 9, 0, 10, 4]
+print(random.choice(lst2))
+print(random.choices(lst2, k=3))  # 和 sample 的区别就是，choices 可以重复取一个元素，
+print(random.sample(lst2, 3))
+random.shuffle(lst2)
+print(lst2)
+
+
+Card = collections.namedtuple('Card', ['rank', 'suit'])
+
+
+class Poker:
+
+    ranks = [str(i) for i in range(2, 11)] + list('JQKA')
+    suits = 'flower black kuai red'.split()
+
+    def __init__(self):
+        self._card = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+
+    def __getitem__(self, item):
+        return self._card[item]
+
+    def __len__(self):
+        return len(self._card)
+
+
+poker = Poker()
+# 排序rank值大小可以由索引来定，suit需要赋予权重
+suit_dict = dict(flower=1, black=2, kuai=3, red=4)
+
+
+def card_value(card):
+    rank_value = Poker.ranks.index(card.rank)
+    suit_value = suit_dict[card.suit]
+    return rank_value + suit_value
+
+
+ret = sorted(poker, key=card_value)
+print(ret)
+
+

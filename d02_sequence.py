@@ -27,6 +27,9 @@
     3、如果要想对一个排好序的序列执行插值操作且保持序列顺序不变。bisect.insort()可以做到。
 9、不要总想着用列表去存数据，要学会根据实际场景选择最佳的数据结构。纯数字集合：array，numpy
    首尾频繁操作：deque  集合中是否存在某元素：set
+
+10、关于序列可分为（list，tuple, collections.deque) 存放多种数据类型；存储的是指向元素的引用。
+    （str, bytes, array.array, bytesarray, memoryview） 存放一种数据类型；存储的是元素本身。
 """
 # 拆包可读性
 data = [('ellen', 18, ['game', 'movie']),
@@ -78,3 +81,103 @@ dq.rotate(3)  # roate(n) 当 n > 0: 将右边的 n 个元素移到左边去；n 
 dq.appendleft(-1)  # 当超过队列指定长度是，旧数据会被挤掉，新数据添加进来。
 print(dq)
 
+# ===================================== review =====================================================
+# 1、列表推导式主要是用来生成列表，尽量保证简洁和可读性
+# 2、过滤或整合其他序列或可迭代对象中的元素（map; filter; reduce; zip; zip_longest;）
+# 3、生成器表达式，惰性运算，解决内存。如果生成器表达式是另外一个函数的唯一参数，那么可以不用带双括号
+'''
+4、元组
+    :不可变列表
+    :没有字段名的记录
+        元组拆包--> 可迭代对象拆包(唯一条件就是拆的变量要和元素对应起来，剩的多余的可以用 *varname 来接收)
+5、切片，[a:b:s] s 的正负只和取值的方向有关，仅此而已。
+    slice 对象：相比切片，增强可读性，避免硬编码
+
+'''
+# 相关面试题：
+# [[0,0,0,0,0,],[0,1,2,3,4,],[0,2,4,6,8,],[0,3,6,9,12,]]
+print([[0 for i in range(5)], [i for i in range(5)],
+       [i for i in range(9) if i % 2 == 0], [i for i in range(13) if i % 3 == 0]])
+
+# Answer:
+list1 = [[i * j for j in range(5)] for i in range(4)]
+print(list1)
+
+# 给定两个list A = [1,2,3,4,5,6,7,1,2,3]和B=[4,5,6,7,8,9,10,9,8,11],
+# 请用python找出A,B 中相同的元素放入列表D中，找出A,B中不同的元素放入列表C中，确保C、D两个列表中的元素不重复（用代码实现）
+
+A = [1,2,3,4,5,6,7,1,2,3]
+B = [4,5,6,7,8,9,10,9,8,11]
+
+D = list(set(A) & set(B))
+print(D)
+C = list(set(A) - set(B)) + list(set(B) - set(A))
+print(C)
+
+# Answer:
+D = [i for i in A if i in B]
+# C = list(set([i for i in A if i not in B] + [j for j in B if j not in A]))
+C = [x for x in set(A + B) if x not in D]
+print(D)
+print(C)
+
+# unicode > 127 的找出来
+symbols = '$¢£¥€¤'
+print([i for i in symbols if ord(i) > 127])
+print(list(filter(lambda x: ord(x) > 127, symbols)))
+
+t = tuple(range(10))
+print(len(t))
+print(sorted(t))
+print(t.count(1))
+print(t.index(5))
+print(t[-1])
+print(t[::-1])
+print(max(t))
+
+print('*' * 100)
+
+
+name, age, hobby, [x, y] = ('ellen', 18, 'reading', ['1', '2'])
+a, b, c, d = 'abcd'
+a, b, *rest = 'abcd'
+
+metro_areas = [
+('Tokyo','JP',36.933, (35.689722, 139.691667)),   # 把最后一位数字<10的筛选出来
+('Delhi NCR', 'IN', 21.935, (28.613889, 77.208889)),
+('Mexico City', 'MX', 20.142, (19.433333, -99.133333)),
+('New York-Newark', 'US', 20.104, (40.808611, -74.020386)),
+('Sao Paulo', 'BR', 19.649, (-23.547778, -46.635833)),
+]
+
+
+def main(areas):
+    ret = []
+    for city, country, num, (i, j) in metro_areas:
+        if j < 0:
+            ret.append((city, country, num, (i, j)))
+    return ret
+
+
+print(main(metro_areas))
+
+
+MetroAreas = namedtuple('MetroAreas', 'city country num coordinate')
+
+new_metro_areas = [MetroAreas(city, country, num, (x, y))for city, country, num, (x, y) in metro_areas]
+print(new_metro_areas)
+
+for new_metro_area in new_metro_areas:
+    print(new_metro_area._fields)
+    print(new_metro_area._asdict())  # 有序字典
+
+
+print(MetroAreas._make(['beijing', 'CN', 100, (2, 3)]))
+
+# Slice
+l1 = list(range(100))
+l2 = slice(10, 20)
+print(l1[l2])
+
+
+# 明天看完第3部分
