@@ -8,12 +8,16 @@
 sorted，max，min 装饰器
 3、map，filter的直接替代品 -- 生成器表达式。相比着lambda表达式可读性更好。
 4、functools.reduce 主要作用就是求和，3版本以来，用sum()求和更好。
-  reduce 和 sum 都是归一函数：把一系列的值整合成一个结果。此外还是 any()/all()
+  reduce 和 sum 都是归一函数：把一系列的值整合成一个结果。此外还有 any()/all()
 5、匿名函数。受python语法限制，lambda表达式要尽量简洁，如果比较复杂请用def实现。lambda表达式常作为高阶函数的
-参数使用，如果map/filter/sorted
+  参数使用，如果map/filter/sorted
 6、如果一个对象要可调用，内部需实现 __call__方法。如装饰器的面向对象写法。
 7、*args和**kwargs 除了基本的用法外，还需要注意一点就是：传参的时候，实参关键字参数形式可以给位置参数传参，注意
 得是同名的位置参数。
+    def func(arg, *, kwarg):
+        print(arg)
+        print(kwarg)
+    func(1, kwarg=2)
 8、函数内省
   func.__code__：存放函数体信息（名称，参数）
   如果想提取一个函数的信息 ————内置模块inspect
@@ -34,6 +38,8 @@ sorted，max，min 装饰器
         partial(func, args, kwargs) 创建一个函数，调用的时候只需要传入部分参数
         如：p = partial(func, 3)   p(2)
         partialmethod : 和partial 一样，不过是冻结方法的参数 注意！要在类内创建
+
+11、
 
 """
 # 阶乘
@@ -184,3 +190,30 @@ class A:
 a = A()
 print(list(map(a.partial_method, range(1, 10))))
 
+# ===================================== review =====================================================
+
+
+def func(arg, *args, kwarg=None, **kwargs):
+    print(arg)
+    print(args)
+    print(kwarg)
+    print(kwargs)
+
+
+func(1, 2, 3, 4, kwarg=5, **dict(a=1, b=2, c=3))
+
+
+def func(arg, kwarg=None):
+    print(arg)
+    print(kwarg)
+
+
+func(5, 6)
+
+
+def func(arg, *, kwarg):
+    print(arg)
+    print(kwarg)
+
+
+func(1, kwarg=2)
