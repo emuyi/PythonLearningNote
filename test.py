@@ -121,12 +121,85 @@ print(pick())
 print(pick())
 
 
+# clip 在max_len前面或后面的第一个空格处截断文本
+
+def clip2(text, max_len=5):
+    """在指定长度前后空白除截断文本"""
+    end = None
+    if len(text) > max_len:
+        space_before = text.rfind(' ', 0, max_len)
+        if space_before >= 0:
+            end = space_before
+        else:
+            space_after = text.rfind(' ', max_len)  # end 不传默认是到最后
+            if space_after >= 0:
+                end = space_after
+    if end is None:  # 没找到空格
+        end = len(text)
+    return text[:end].rstrip()
 
 
+text = 'wef wefw ojiojoj'
 
 
+def clip(text, max_len=5):
+    ret_index = None
+    if len(text) > max_len:
+        space_before = text.find(' ', 0, max_len)
+        if space_before != -1:
+            ret_index = space_before
+        else:
+            space_after = text.find(' ', max_len)
+            if space_after != -1:
+                ret_index = space_after
+    if ret_index is None:
+        ret_index = len(text)
+    return text[:ret_index].strip()
 
 
+print(clip(text))
+
+
+# decorator
+def decorator(func):
+    def inner(*args, **kwargs):
+        print(1111111111111)
+        # ret = func(*args, **kwargs)
+        return ret
+    return inner
+
+
+@decorator  # test = decorator(test)
+def test(x, y):
+    print(222222222222)
+    print(x + y)
+
+
+test(2, 4)
+# 求移动均价
+price_list = []
+
+
+def avg(price):
+    price_list.append(price)
+    return sum(price_list) / len(price_list)
+
+
+def make_average():
+    price_list = []
+    def average(price):
+        price_list.append(price)
+        return sum(price_list) / len(price_list)
+    return average
+
+avg = make_average()
+print(avg(10))
+print(avg(11))
+print(avg(12))
+
+# LRU 算法实现
+# 两种方式实现斐波那契数列
+# 理解 @lru_cache
 
 
 

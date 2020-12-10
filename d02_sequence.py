@@ -362,7 +362,6 @@ bisect.insort_left(data, 20)  # 先bisect O(logN)  再 insert O(N)
 bisect.insort_right(data, 20)
 print(data)
 
-
 scores = [33, 99, 77, 70, 89, 90, 100, 60]
 
 
@@ -406,6 +405,7 @@ dq.extend([10, 11, 12])
 dq.extendleft([-1, -2])
 dq.rotate(-4)  # n > 0 将后面n个移到前面，n < 0 将前面的n个移到后面
 print(dq)
+
 
 
 

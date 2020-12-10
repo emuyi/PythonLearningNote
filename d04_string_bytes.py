@@ -21,4 +21,5 @@
     str.startswith/endswith/lower/upper
     str.format
     str.replace(old, new)
+
 """

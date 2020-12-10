@@ -27,19 +27,24 @@ sorted，max，min 装饰器
 10、内置函数式编程模块
     operator:
         1、mul: 搭配reduce实现阶乘 operator 有很多关于运算符的函数
-        2、itemgetter: 获取序列或者可迭代你对象的元素，常和内置的那几个高阶函数一块使用
+        2、itemgetter: 获取序列中的某个元素，常和内置的那几个高阶函数一块使用
         用来替代lambda表达式 如：sorted(seq, key=itemgetter(1))
-        并且 itemgetter 可以获取多个元素 如：itemgetter(1,2)(seq)
+        原理：itemgetter(index1, index2..) 是一个可调用对象，调用的时候接收一个seq做为参数，然后执行 seq[index] 的操作。
         3、attrgetter: 根据对象属性名称获取对象属性，和 itemgetter的用法一样。
         不过是一个获取序列的元素一个是获取对象的属性。
     functools:
-        1、reduce：求和、阶乘
+        1、reduce：常用来求和（sum） 和 求阶乘
         2、partial & partialmethod：偏函数（冻结部分参数）首先是一个高阶函数
         partial(func, args, kwargs) 创建一个函数，调用的时候只需要传入部分参数
-        如：p = partial(func, 3)   p(2)
+        如：p = partial(func, 3); p(2)
         partialmethod : 和partial 一样，不过是冻结方法的参数 注意！要在类内创建
+        class B:
+            def method(self, x, y):
+                return x + y
+            partial_method = partialmethod(method, 1)
 
-11、
+        b = B()
+        ret = b.partial_method(3)
 
 """
 # 阶乘
@@ -114,8 +119,8 @@ def clip2(text, max_len=5):
 
 text = 'qqr weqwe eeeee'
 print(clip2(text))
-print(clip2.__defaults__)
-print(clip.__code__.co_varnames)
+# print(clip2.__defaults__)
+# print(clip.__code__.co_varnames)
 
 # operator
 from operator import mul, itemgetter, attrgetter
@@ -127,18 +132,7 @@ def fact(n):
 
 
 print(fact(3))
-metro_data = [
-('Tokyo', 'JP', 36.933, (35.689722, 139.691667)),
-('Delhi NCR', 'IN', 21.935, (28.613889, 77.208889)),
-('Mexico City', 'MX', 20.142, (19.433333, -99.133333)),
-('New York-Newark', 'US', 20.104, (40.808611, -74.020386)),
-('Sao Paulo', 'BR', 19.649, (-23.547778, -46.635833))]
 
-# 根据 36.933 字段给列表排序
-
-metro_data_new = sorted(metro_data, key=lambda x:x[2])
-metro_data_new2 = sorted(metro_data, key=itemgetter(2))
-print(metro_data_new2)
 """
 from operator import itemgetter, attrgetter
 t = tuple('abc')
@@ -190,7 +184,7 @@ class A:
 a = A()
 print(list(map(a.partial_method, range(1, 10))))
 
-# ===================================== review =====================================================
+# ===================================== review ================================================================
 
 
 def func(arg, *args, kwarg=None, **kwargs):
@@ -217,3 +211,63 @@ def func(arg, *, kwarg):
 
 
 func(1, kwarg=2)
+
+
+# 三种方式实现阶乘
+# 递归
+def f1(n):
+    return 1 if n < 2 else n * f1(n - 1)
+
+
+def f2(n):
+    return reduce(mul, range(1, n+1))
+
+
+def f3(n):
+    ret = 1
+    for i in range(1, n+1):
+        ret *= i
+    return ret
+
+
+print(f1(5), f2(5), f3(5))
+
+print('===========================================')
+# itemgetter
+from operator import itemgetter, attrgetter
+ret = itemgetter(0, 2, 3)('abcdefg')
+print(ret)
+metro_data = [
+('Tokyo', 'JP', 36.933, (35.689722, 139.691667)),
+('Delhi NCR', 'IN', 21.935, (28.613889, 77.208889)),
+('Mexico City', 'MX', 20.142, (19.433333, -99.133333)),
+('New York-Newark', 'US', 20.104, (40.808611, -74.020386)),
+('Sao Paulo', 'BR', 19.649, (-23.547778, -46.635833))]
+
+# 根据 36.933 字段给列表排序
+metro_data_new = sorted(metro_data, key=lambda x:x[2])
+metro_data_new2 = sorted(metro_data, key=itemgetter(1, 2))
+print(metro_data_new2)
+from functools import partial, partialmethod
+
+
+# 偏函数(冻结部分参数)
+def func(a, b, c):
+    print(a, b, c)
+
+
+partial_func = partial(func, 2, c=3)
+partial_func(1)
+
+
+# 必须要在类中定义 partialmethod
+class B:
+
+    def method(self, x, y):
+        return x + y
+    partial_method = partialmethod(method, 1)
+
+
+b = B()
+ret = b.partial_method(3)
+print(ret)
