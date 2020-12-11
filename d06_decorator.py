@@ -9,13 +9,13 @@
 的场景。
 5、闭包函数
     1、函数体内如果有赋值操作，那么python在编译函数体的时候就会认为赋值的变量是局部变量。
-    使用global关键字可以将其声明为全局变量，然后再使用。
+      使用global关键字可以将其声明为全局变量，然后再使用。
     2、理解闭包，闭包函数往往是嵌套函数，内层函数能访问自身之外的非全局变量。
-    同样，内层函数只能访问外层函数的变量而不能赋值修改，如果想要赋值修改需要使用nonlocal关键字声明变量为
-    自由变量。
+       同样，内层函数只能访问外层函数的变量而不能赋值修改，如果想要赋值修改需要使用nonlocal关键字声明变量为
+       自由变量。
 6、标准库中的装饰器
     functools.wraps/functools.lru_cache/functools.singledispatch
-    functools.lru_cache: 递归算法优化
+    functools.lru_cache: 常用来优化递归
         1、lru算法：简单理解lru算法，就是如果一段数据最近访问过，那么将来访问的概率也很大。常用来做缓存淘汰策略。
         即缓存中数据满了，根据lru原则，淘汰长时间很少访问的数据来释放缓存空间。可以使用OrderdDict来实现
         lru算法。
@@ -24,12 +24,12 @@
         typed=False 如果typed为True，会将不同的数据类型单独存放。
         3、注意！lru_cache 内部是用字典来实现的，并且会以函数的参数作为键，因此被装饰的函数的参数必须是可
         散列的。
-    functools.singledispath: 单分派泛函数
+     functools.singledispath: 单分派函数
         可以用来优化 if isinstance()/elif isinstance()/elif isinstance() 这样的根据不同的类型做
         不同处理的结构，主要是提供了一种模块化的解耦。比如说，如果使用if/elif结构，需要将所有的类型全部导入过
         来并且要新增类型，if/elif的代码就得更新一次。如果使用 singledispatch的话，可以把被singdispatch
         装饰的函数导入过来(func) 并且使用 @func.register(NewClass) 注册下新增的类及装饰对应的处理逻辑。
-        调用的时候只需要调用funnc(newObj)即可
+        调用的时候只需要调用fuc(newObj)即可
 7、叠加装饰器和参数化装饰器
     a、叠加装饰器
     @d1
@@ -41,6 +41,7 @@
 8、对象版的装饰器 __call__
 '''
 from functools import wraps, lru_cache, singledispatch
+
 
 # 经典的装饰器模型
 def decorator(func):
@@ -166,30 +167,7 @@ def fibo(n):
     return fibo(n-2) + fibo(n-1)
 
 
-# singledispath
-import math
 
-@singledispatch
-def area(obj):
-    raise LookupError('{} not found'.format(obj))
-
-
-class Circle:
-    def __init__(self, r):
-        self.r = r
-
-
-class HAHA:
-    pass
-
-
-@area.register(Circle)
-def _(obj):       # 如果注册了直接走注册的逻辑分支，否走area
-    return math.pi * (obj.r ** 2)
-
-
-print(area(Circle(2)))
-# print(area(HAHA))
 
 # 参数化装饰器
 
@@ -246,3 +224,28 @@ def func(x):
 
 func(3)
 print(y)
+
+# singledispath
+import math
+
+@singledispatch
+def area(obj):
+    raise LookupError('{} not found'.format(obj))
+
+
+class Circle:
+    def __init__(self, r):
+        self.r = r
+
+
+class HAHA:
+    pass
+
+
+@area.register(Circle)
+def _(obj):       # 如果注册了直接走注册的逻辑分支，否走area
+    return math.pi * (obj.r ** 2)
+
+
+print(area(Circle(2)))
+# print(area(HAHA))

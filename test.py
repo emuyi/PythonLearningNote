@@ -198,8 +198,103 @@ print(avg(11))
 print(avg(12))
 
 # LRU 算法实现
+from collections import OrderedDict
+class LRU:
+
+    def __init__(self, maxsize=10):
+        self.maxsize = maxsize
+        self.data = OrderedDict()
+
+    def put(self, key, value):
+        if len(self.data) > self.maxsize:
+            self.data.popitem(last=False)
+        self.data[key] = value
+
+    def get(self, key):
+        return self.data.get(key, None)
+
 # 两种方式实现斐波那契数列
-# 理解 @lru_cache
+def fibo(n):
+    return n if n < 2 else fibo(n-1) + fibo(n-2)
+
+def fibo2(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a+b
+    return a
+
+# singledispatch
+from functools import singledispatch
 
 
+@singledispatch
+def print_func(arg):
+    print('你没注册，走我这边')
+
+
+
+@print_func.register(str)
+def _(arg):
+    print('str 应该有的打印格式')
+
+
+@print_func.register(list)
+def _(arg):
+    print('list 应该有的打印格式')
+
+
+
+# =========================================
+import math
+@singledispatch
+def area(obj):
+    raise LookupError(' Not register')
+
+
+
+class Circle:
+
+    def __init__(self, r):
+        self.r = r
+
+
+
+@area.register(Circle)
+def _(obj):
+    print(math.pi * (obj.r**2))
+
+
+print_func('1')
+print_func([1, 2, 3, 4])
+area(Circle(1))
+
+# 带参数的注册类型装饰器
+
+data_list = []
+
+
+def decorator(active=True):
+    def register(func):
+        print('带参数的装饰器')
+        if active:
+            data_list.append(func)
+        return func
+    return register
+
+
+@decorator()
+def foo():
+    print('foo is running')
+
+
+@decorator(active=False)
+def bar():
+    print('bar is running')
+
+
+print('=' * 100)
+foo()
+bar()
+print(data_list)
+print(foo.__name__)
 
