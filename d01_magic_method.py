@@ -103,6 +103,9 @@ class Poker:
     def __getitem__(self, item):
         return self._card[item]
 
+    def __setitem__(self, key, value):
+        self._card[key] = value
+
     def __len__(self):
         return len(self._card)
 
@@ -121,4 +124,6 @@ def card_value(card):
 ret = sorted(poker, key=card_value)
 print(ret)
 
+random.shuffle(poker)  # TypeError: 'Poker' object does not support item assignment
 
+print(list(poker))

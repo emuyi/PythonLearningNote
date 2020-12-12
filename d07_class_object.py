@@ -45,9 +45,26 @@
     >>> a.indices(len(s))
     >>> (5, 10, 2)
 
+15、__getattr__ / __setattr__
+    getattr: 当获取对象中不存在的属性时，会调用 getattr
+    setattr: 当给对象添加属性, 更改属性值时会被调用 （本质上是在管理 self.__dict___） 利用 __setattr__ 可以给对象设置只读属性
+    也可以禁止对象新增属性。
+
+16、functools.reduce
+    把一系列值归约成单个值。 reduce() 函数的第一个参数是接受两个参数的函数，第二个参数是一个可迭代的对象,
+    第三个参数是当可迭代对象为空时，设置的初始值。
+    TypeError: reduce() of empty sequence with no initial value
+
+17、如何高效的对两个或多个可迭代对象做等值测试？
+    1、判断长度
+    2、判断内部元素
+    一行代码：len(iter1) == len(iter2) == len(iter3) and all(x == y == z for x, y, z in zip(iter1, iter2, iter3))
+    zip(iterable...) 可以并性迭代两个或多个可迭代对象，返回的元组可以拆包成变量，分别对应每个并行迭代的元素。
+    itertools.ziplongest(iterable..., fillvalue=xx)
 """
 
-
+from functools import reduce
+from operator import xor
 # 不要使用可变数据类型作为函数的默认参数
 class Subway:
 
@@ -186,14 +203,24 @@ import reprlib, numbers
 
 class Vector:
 
+    attrs = 'xyzt'
+
     def __init__(self, iterable):
         self.data = [float(i) for i in iterable]  # dataType 可否考虑过数组
 
     def __iter__(self):
         return (i for i in self.data)   # iter(self.data)
 
+    # def __eq__(self, other):   # 存在效率问题
+    #     return tuple(self.data) == tuple(other)
+
     def __eq__(self, other):
-        return tuple(self.data) == tuple(other)
+        if len(self) != len(other):
+            return False
+        for a, b in zip(self, other):
+            if a != b:
+                return False
+        return True          # return len(self) == len(other) and all(a = b for a, b in zip(self, other))
 
     def __bool__(self):
         if not self.data:
@@ -218,23 +245,84 @@ class Vector:
         else:
             raise TypeError('must be integer!!!')
 
+    # 以 x, y, z, t 为属性，访问前四个分量的值  1、可以做4个 @property 来处理
+
+    # def __getattr__(self, item):
+    #     index = self.attrs.find(item)  # 有没有考虑到对 item 长度的限定
+    #     if index != -1:
+    #         return self.data[index]   # !有没有考虑到边界问题， 不仅仅为拘泥于功能的实现，而是将问题抽象起来，这是一种需要持续培养的能力
+    #     raise LookupError('no such attr!')
+    def __getattr__(self, item):   # 仍然会有问题，想下 getattr 的处理机制
+        if len(item) == 1:
+            index = Vector.attrs.find(item)
+            if 0 <= index < len(self.data):
+                return self.data[index]
+        raise AttributeError('No such attribute!')
+
+    def __setattr__(self, key, value):  # 处理上方问题，将 attrs 冻结不允许修改值，同时限制给对象新添加指定类型的属性值
+        if len(key) == 1:
+            if key in Vector.attrs:
+                error = 'readonly attribute'
+            elif key.islower():
+                error = 'No lower!'
+            else:
+                error = ''
+            if error:
+                raise AttributeError(error)
+
+        super().__setattr__(key, value)   # 运行 v 有正常的添加属性操作
+
     def __len__(self):
         return len(self.data)
+
+    def __hash__(self):
+        hash_values = map(hash, self.data)
+        return reduce(xor, hash_values)
 
 
 v = Vector(range(1, 10))
 print(v[-1])
-for i in v[1:10]:
-    print(i)
+print(v.x, v.y, v.z, v.t)
+
+v.x = 10
+print(v.x)  # 10
+print(repr(v))  # Vector([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, ...])
 
 
-# # 切片原理
-# class B:
-#
-#     def __getitem__(self, index):
-#         return index
-#
-#
-# b = B()
-# print(b[-1])
-# print(b[1:4:2])
+
+
+# 切片原理
+class B:
+
+    def __getitem__(self, index):
+        return index
+
+
+b = B()
+print(b[-1])
+print(b[1:4:2])
+print('=' * 150)
+# 理解 getattr 和 setattr
+
+
+class User:
+
+    def __init__(self, name):
+        self.name = name       # 走 settattr
+
+    def __getattr__(self, item):
+        print('---getattr---')
+        return 1
+
+    def __setattr__(self, key, value):
+        print('---setattr---')
+        self.__dict__[key] = value   # __setattr__ 管理的是 self.__dict__
+
+
+ellen = User('ellen')
+print(ellen.name)
+ellen.age = 18
+print(ellen.age)
+ellen.age = 16
+print(ellen.age)
+print(ellen.hobby)

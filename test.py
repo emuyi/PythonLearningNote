@@ -242,8 +242,6 @@ def _(arg):
 def _(arg):
     print('list 应该有的打印格式')
 
-
-
 # =========================================
 import math
 @singledispatch
@@ -297,4 +295,46 @@ foo()
 bar()
 print(data_list)
 print(foo.__name__)
+
+
+# 类装饰器
+class Decorator:
+
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print('before')
+        ret = self.func(*args, **kwargs)
+        print('after')
+        return ret
+
+
+@Decorator
+def func(x, y):
+    return x + y
+
+
+print(func(1, 2))
+
+import operator
+# 求 3个 item[1] 的和 即 2 + 50 + 8
+
+my_list = [[1, 2, 3], [40, 50, 60], [9, 8, 7]]
+
+
+def sum_func():
+    item = 0
+    for i in my_list:
+        item += i[1]
+    return item
+
+
+print(sum_func())
+print(sum(item[1] for item in my_list))
+
+
+
+
+
 
