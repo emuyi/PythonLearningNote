@@ -43,14 +43,46 @@
         print(i)
     for i in ret2:
         print(i)
-8、
 
+8、 多数据类型等差数列
+    def aritprog_gen(begin, step, end=None):
+        result = type(begin + step)(begin)
+        forever = end is None
+        index = 0
+        while forever or result < end:
+            yield result
+            index += 1
+            result = begin + step * index
 
+9、内置生成器类型
+    itertools.count(start, step) : 生成无穷等差数列
+    itertools 模块
+    itertools.groupby(iterable, key=None) 按条件对可迭代对象进行分组，条件可以用key参数指定。如果没有指定，就按照元素本身分组
+    返回的是一个（key, group), group 是一个迭代器包含组内元素。
+
+    s = 'LLLLAAGGG'
+    ret = itertools.groupby(s)
+    for key, group in ret:
+        print(key)
+        for i in group:
+            print(i)
+
+10、yield from iterable
+    yield from 经常跟一个可迭代对象，会迭代可迭代对象将其内部的值返回。
+    等价于
+        for item in iterable:
+            yield item
+
+11、iter() 有两个用法：
+    1、iter(iterable) --> iterator
+    2、iter(callable, 标识符) 当可调用对象返回标识符时，抛出一个 StopIteration 的异常。
 
 """
 
 import re
+import random
 import reprlib
+import itertools
 from collections.abc import Iterator
 RE_WORD = re.compile(r'\w+')
 
@@ -210,23 +242,29 @@ class MyRangeIterator:
         pass
 
 
+# yield from
+it = [(1, 2), (3, 4)]
 
 
+def foo():
+    for i in it:
+        yield from i
 
 
+for i in foo():
+    print(i)
 
 
+# iter() 的另外一个用法
+def func():
+    return random.randint(1, 3)
 
 
+ret = iter(func, 2)
 
-
-
-
-
-
-
-
-
+print(next(ret))
+print(next(ret))
+print(next(ret))
 
 
 
