@@ -59,7 +59,7 @@
     1、判断长度
     2、判断内部元素
     一行代码：len(iter1) == len(iter2) == len(iter3) and all(x == y == z for x, y, z in zip(iter1, iter2, iter3))
-    zip(iterable...) 可以并性迭代两个或多个可迭代对象，返回的元组可以拆包成变量，分别对应每个并行迭代的元素。
+    zip(iterable...) 可以并行迭代两个或多个可迭代对象，返回的元组可以拆包成变量，分别对应每个并行迭代的元素。
     itertools.ziplongest(iterable..., fillvalue=xx)
 """
 

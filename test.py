@@ -337,4 +337,3 @@ print(sum(item[1] for item in my_list))
 
 
 
-
